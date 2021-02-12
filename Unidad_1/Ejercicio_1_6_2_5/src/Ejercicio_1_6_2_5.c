@@ -1,6 +1,16 @@
 /*
  ============================================================================
- Name        : Pruebas.c
+ Name        : Ejercicio_1_6_2_5.c
+ Author      : JuanCardozo
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+/*
+ ============================================================================
+ Name        : Ejercicio_1_6_2_6.c
  Author      : JuanCardozo
  Version     :
  Copyright   : Your copyright notice
