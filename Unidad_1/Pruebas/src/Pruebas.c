@@ -10,25 +10,29 @@
 
 #include <stdio.h>
 
-struct cdsMusica{
-
-		char titulo[40];
-		char artista[40];
-		char genero[15];
-		int numCanciones;
-		int lanzamiento;
-		int precio;
-};
-
-void printStruct(struct cdsMusica cd){
-	printf(" Titulo: %s\n Artista: %s\n Genero:%s\n Número de canciones:%d\n Fecha de lanzamiento:%d\n Precio:%d\n ", cd.titulo, cd.artista, cd.genero, cd.numCanciones, cd.lanzamiento, cd.precio);
-}
+const char FILE_NAME[] = "input.txt";
 
 int main(void)
 {
 
-	struct cdsMusica cd1 = {"Brindo con el alma", "Diomedez Díaz", "Vallenato", 11, 1986, 19900};
-	printStruct(cd1);
+	int count = 0;
+	FILE *in_file;
 
+	int ch;
+	in_file = fopen(FILE_NAME, "r");
+	if(in_file == NULL)
+	{
+		printf("Cannot open %s\n", FILE_NAME);
+		exit(8);
+	}
+	while(1)
+	{
+		ch = fgetc(in_file);
+		if(ch == EOF)
+			break;
+			++count;
+	}
+	printf("Number of characters in %s is %d\n", FILE_NAME, count);
+	fclose(in_file);
 	return 0;
 }
