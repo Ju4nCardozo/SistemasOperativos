@@ -9,30 +9,46 @@
  */
 
 #include <stdio.h>
-
-const char FILE_NAME[] = "input.txt";
+#include <stdlib.h>
 
 int main(void)
 {
 
 	int count = 0;
-	FILE *in_file;
-
 	int ch;
-	in_file = fopen(FILE_NAME, "r");
-	if(in_file == NULL)
+	FILE *in_file1;
+	FILE *in_file2;
+	char FILE_NAME1[];
+	char FILE_NAME2[];
+
+	printf("Ingrese el nombre del primer archivo: ");
+	scanf("%s\n", &FILE_NAME1);
+	printf("Ingrese el nombre del segundo archivo: ");
+	scanf("%s\n", &FILE_NAME2);
+
+	in_file1 = fopen(FILE_NAME1, "r");
+
+	if(in_file1 == NULL)
 	{
-		printf("Cannot open %s\n", FILE_NAME);
+		printf("Cannot open %s\n", FILE_NAME1);
 		exit(8);
 	}
-	while(1)
+	in_file2 = fopen(FILE_NAME1, "w");
+
+		if(in_file2 == NULL)
+		{
+			printf("Cannot open %s\n", FILE_NAME2);
+			exit(8);
+		}
+	while(!feof(FILE_NAME1))
 	{
-		ch = fgetc(in_file);
-		if(ch == EOF)
-			break;
+		ch = fgetc(in_file1);
+		if(ch != EOF)
+			fputc(ch,FILE_NAME2);
 			++count;
 	}
-	printf("Number of characters in %s is %d\n", FILE_NAME, count);
-	fclose(in_file);
+	printf("Number of characters written was %d\n", count);
+	fclose(in_file1);
+	fclose(in_file2);
 	return 0;
 }
