@@ -12,13 +12,9 @@
 
 int main(void)
 {
-    int a;
-    printf("enter a number: ");
-    while (scanf("%d", &a) != 1)
-    {
-        // input was not a number, ask again:
-        printf("enter a number: ");
-    }
-    printf("You entered %d.\n", a);
+    char name[40];
+    printf("What's your name? ");
+    scanf("%39[^\n]", name);
+    printf("Hello %s!\n", name);
 }
 
