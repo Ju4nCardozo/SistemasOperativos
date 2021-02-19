@@ -8,13 +8,17 @@
  ============================================================================
  */
 
+
 #include <stdio.h>
 
-int main(void)
+int main(int argc, char* argv[])
 {
-    char name[40];
-    printf("What's your name? ");
-    scanf("%39[^\n]", name);
-    printf("Hello %s!\n", name);
-}
+
+   #ifdef CONDITION
+   printf("CODIGO IF\n");
+   #else
+   printf("CODIGO ELSE\n");
+   #endif
+   return 0;
+ }
 
