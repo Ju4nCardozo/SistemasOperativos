@@ -16,6 +16,7 @@ int opcion=0;
 int size=0;
 char *pnombre;
 char nombrebd[20];
+char loadbd[20];
 
 
 typedef struct estudiantes
@@ -45,7 +46,45 @@ void mkdb(char *pnombre, int size)
 
 void load(char *pnombre)
 {
+	estudiantesg = (estudiante*)malloc(size*sizeof(estudiante));
+	char nombreb[100]="/home/juancardozo/Documents/";
+	char ext[5]=".txt";
+	int cont=0;
 
+	strcat(nombreb,pnombre);
+	strcat(nombreb,ext);
+	loadbd = pnombre;
+
+	in_file = fopen(nombreb, "r");
+
+	if(in_file == NULL)
+	{
+		printf("El archivo especificado no existe %s\n", nombreb);
+		exit(8);
+	}
+
+	while(1)
+	{
+		if(feof(in_file))
+		{
+			break;
+		}
+
+		if(cont%3==0)
+		{
+
+		}
+		fscanf(in_file, "%d", &(estudiantesg+cont)->cedula);
+		fscanf(in_file, "%s", &(estudiantesg+cont)->nombre);
+		fscanf(in_file, "%d", &(estudiantesg+cont)->semestre);
+
+		if(cont>0)
+		{
+			estudiantesg = (estudiante *)realloc(estudiantesg,((cont+1)*sizeof(estudiante)));
+		}
+
+		cont++;
+	}
 }
 
 void savedb(char *pnombre)
