@@ -10,30 +10,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int exitwhile = 1;
-int opcion=0;
-int size=0;
-char *pnombre;
+int size;
 char nombrebd[20];
-char loadbd[20];
-
 
 typedef struct estudiantes
- {
+{
      int cedula;
      char nombre[30];
      int semestre;
- }estudiante;
+}estudiante;
 
 estudiante *estudiantesg;
 FILE *in_file;
 
-void mkdb(char *pnombre, int size)
+void mkbd(char *nombre, int sizef)
 {
-	estudiantesg = (estudiante*)malloc(size*sizeof(estudiante));
+	size = sizef;
+	estudiantesg = (estudiante*)malloc(sizef*sizeof(estudiante));
 
-	for(int i = 0; i < size; i++)
+	for(int i = 0; i < sizef; i++)
 	{
 		printf("Ingrese el nombre del estudiante: \n");
 		scanf("%s", &(estudiantesg+i)->nombre);
@@ -44,7 +42,7 @@ void mkdb(char *pnombre, int size)
 	}
 }
 
-void load(char *pnombre)
+void loadbd(char *pnombre)
 {
 	estudiantesg = (estudiante*)malloc(size*sizeof(estudiante));
 	char nombreb[100]="/home/juancardozo/Documents/";
@@ -53,7 +51,6 @@ void load(char *pnombre)
 
 	strcat(nombreb,pnombre);
 	strcat(nombreb,ext);
-	loadbd = pnombre;
 
 	in_file = fopen(nombreb, "r");
 
@@ -70,24 +67,21 @@ void load(char *pnombre)
 			break;
 		}
 
-		if(cont%3==0)
-		{
-
-		}
-		fscanf(in_file, "%d", &(estudiantesg+cont)->cedula);
-		fscanf(in_file, "%s", &(estudiantesg+cont)->nombre);
-		fscanf(in_file, "%d", &(estudiantesg+cont)->semestre);
-
 		if(cont>0)
 		{
 			estudiantesg = (estudiante *)realloc(estudiantesg,((cont+1)*sizeof(estudiante)));
 		}
 
+		fscanf(in_file, "%d", &(estudiantesg+cont)->cedula);
+		fscanf(in_file, "%s", &(estudiantesg+cont)->nombre);
+		fscanf(in_file, "%d", &(estudiantesg+cont)->semestre);
+
 		cont++;
 	}
+	fclose(in_file);
 }
 
-void savedb(char *pnombre)
+void savebd(char *pnombre)
 {
 	char nombreb[100]="/home/juancardozo/Documents/";
 	char ext[5]=".txt";
@@ -104,22 +98,39 @@ void savedb(char *pnombre)
 
 void readall()
 {
+	for(int i=0; i<size;i++){
 
+		printf("Nombre: %s\n", (estudiantesg+i)->nombre);
+		printf("Cédula: %d\n", (estudiantesg+i)->cedula);
+		printf("Semestre: %d\n", (estudiantesg+i)->semestre);
+	}
 }
-
-void readsize()
+int readsize()
 {
-
+	return size;
 }
 
 void mkreg(int cedula, char *pnombreE, int semestre)
 {
+	size += 1;
+	estudiantesg = (estudiante *)realloc(estudiantesg,((size)*sizeof(estudiante)));
+	strcpy((estudiantesg+(size-1))->nombre,pnombreE);
+	(estudiantesg+(size-1))->cedula = cedula;
+	(estudiantesg+(size-1))->semestre = semestre;
 
 }
 
 void readreg(int cedula)
 {
-
+	for(int i = 0; i < size; i++)
+	{
+		if((estudiantesg+i)->cedula == cedula)
+		{
+			printf("Nombre: %s\n", (estudiantesg+i)->nombre);
+			printf("Cédula: %d\n", (estudiantesg+i)->cedula);
+			printf("Semestre: %d\n", (estudiantesg+i)->semestre);
+		}
+	}
 }
 
 int exitp()
@@ -127,54 +138,113 @@ int exitp()
 	return 0;
 }
 
-int main(void) {
+ int main() {
 
+	char comando[30];
+	char flujoentrada;
+	char del[]=" ";
+
+	printf("Presione enter para empezar el programa");
 	do
 	{
-		printf("Ingrese una opción:\n");
-		printf("1. Crear una base de datos\n");
-		printf("2. Cargar la base de datos en memoria\n");
-		printf("3. Guardar base de datos\n");
-		printf("4. Leer registros de la BD\n");
-		printf("5. Obtener el número de registros de la BD\n");
-		printf("6. Añadir un nuevo registro\n");
-		printf("7. Imprimir registro\n");
-		printf("8. Salir\n");
+		fgets(comando,31,stdin);
+		printf("Ingrese un comando:\n");
+		fgets(comando,31,stdin);
+	    comando[strcspn(comando, "\n")] = '\0';
+		char *token = strtok(comando, del);
+		printf("Encontramos un token: %s\n", token);
 
-		printf("Ingrese una opción:\n");
-		scanf("%d", &opcion);
-
-		switch(opcion)
+		if(strcmp(token, "mkbd")==0)
 		{
-			case 1:
-				printf("Ingrese el nombre de la BD\n");
-				scanf("%s", &nombrebd);
-				printf("Ingrese la cantidad de registros de la BD\n");
-				scanf("%d", &size);
-				mkdb(nombrebd,size);
-				break;
-			case 2:
+			char arg1[20];
+			char arg2[10];
+			int cont=0;
 
-				break;
-			case 3:
-				printf("Ingrese el nombre de la BD\n");
-				scanf("%s", &nombrebd);
-				savedb(nombrebd);
-				break;
-			case 4:
-				break;
-			case 5:
-				break;
-			case 6:
-				break;
-			case 7:
-				break;
-			case 8:
-				exitwhile = exitp();
-				break;
+			while( token != NULL )
+			{
+				token = strtok(NULL, " ");
+				if(cont==0)
+				{
+					strcpy(arg1,token);
+					printf("%s\n", arg1);
+				}else if(cont==1)
+				{
+					strcpy(arg2,token);
+					printf("%s\n", arg2);
+				}
+				cont++;
+			}
+			mkbd(arg1,atoi(arg2));
+		}else if(strcmp(token, "loadbd")==0)
+		{
+			char arg1[20];
+			int cont=0;
+
+			token = strtok(NULL, " ");
+			strcpy(arg1,token);
+			printf("%s\n", arg1);
+			cont++;
+
+			loadbd(arg1);
+		}else if(strcmp(token,"savebd")==0)
+		{
+			char arg1[20];
+			int cont=0;
+
+			token = strtok(NULL, " ");
+			strcpy(arg1,token);
+			printf("%s\n", arg1);
+			cont++;
+			savebd(arg1);
+
+		}else if(strcmp(token,"readall")==0)
+		{
+			readall();
+		}else if(strcmp(token,"readsize")==0)
+		{
+			printf("%d",readsize());
+		}else if(strcmp(token, "mkreg")==0)
+		{
+			char arg1[20];
+			char arg2[30];
+			char arg3[3];
+			int cont=0;
+
+			while( token != NULL )
+			{
+				token = strtok(NULL, " ");
+				if(cont==0)
+				{
+					strcpy(arg2,token);
+					printf("%s\n", arg2);
+				}else if(cont==1)
+				{
+					strcpy(arg1,token);
+					printf("%s\n", arg1);
+				}else if(cont==2){
+					strcpy(arg3,token);
+					printf("%s\n", arg3);
+				}
+				cont++;
+			}
+			mkreg(atoi(arg2),arg1,atoi(arg3));
+		}else if(strcmp(token, "readreg")==0)
+		{
+			char arg1[30];
+			int cont=0;
+
+			token = strtok(NULL, " ");
+			strcpy(arg1,token);
+			printf("%s\n", arg1);
+			readreg(atoi(arg1));
+
+		}else if(strcmp(token, "exit")==0)
+		{
+			exitwhile=exitp();
+		}else
+		{
+			printf("Error en el comando");
 		}
-
-
 	}while(exitwhile!=0);
 	return 0;
 }
