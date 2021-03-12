@@ -44,7 +44,7 @@ void mkbd(char *nombre, int sizef)
 
 void loadbd(char *pnombre)
 {
-	estudiantesg = (estudiante*)malloc(size*sizeof(estudiante));
+	estudiantesg = (estudiante*)malloc(sizeof(estudiante));
 	char nombreb[100]="/home/juancardozo/Documents/";
 	char ext[5]=".txt";
 	int cont=0;
@@ -78,6 +78,8 @@ void loadbd(char *pnombre)
 
 		cont++;
 	}
+	size=cont-1;
+	printf("%d", size);
 	fclose(in_file);
 }
 
@@ -141,18 +143,15 @@ int exitp()
  int main() {
 
 	char comando[30];
-	char flujoentrada;
 	char del[]=" ";
 
-	printf("Presione enter para empezar el programa");
 	do
 	{
 		fgets(comando,31,stdin);
-		printf("Ingrese un comando:\n");
+		printf("%s\n", "Ingrese un comando:");
 		fgets(comando,31,stdin);
 	    comando[strcspn(comando, "\n")] = '\0';
 		char *token = strtok(comando, del);
-		printf("Encontramos un token: %s\n", token);
 
 		if(strcmp(token, "mkbd")==0)
 		{
