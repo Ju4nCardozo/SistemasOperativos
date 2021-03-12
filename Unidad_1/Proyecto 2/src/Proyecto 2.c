@@ -46,7 +46,8 @@ struct databases
 {
 	char nombre[30];
 	int size;
-	struct estudiantes** registros;
+	int cant_reg;
+	struct estudiantes* registros;
 };
 
 //Memory allocator
@@ -60,7 +61,8 @@ void db_ctor(struct databases* database, char *nombre, int size)
 {
 	strcpy(database->nombre, nombre);
 	database->size = size;
-	database->registros = (struct estudiantes*)malloc(size*sizeof(struct estudiantes));
+	database->cant_reg = 0;
+	database->registros = malloc(database->size*sizeof(struct estudiantes));;
 }
 
 // Destructor
@@ -95,25 +97,20 @@ void gestor_dtor(struct gestores* gestor) {
 	//free();
 }
 
-struct databases* mdb(char *nombre, int size)
-{
-	struct bd* database = db_new();
-	db_ctor(database,nombre,size);
-
-	return database;
-}
-
-struct databases* ldb(char *pnombre)
+void mdb(struct gestores* gestor,int contdb,char *nombre, int size)
 {
 	struct databases* database = db_new();
-	struct estudiantes* registros = estudiante_new();
-	database->registros = registros;
+	db_ctor(database,nombre,size);
+	gestor->bases[contdb] = database;
+}
+
+void ldb(struct gestores* gestor,int contdb,char *pnombre)
+{
+	struct databases* database = db_new();
 	char nombreb[100]="/home/juancardozo/Documents/";
-	char ext[5]=".txt";
 	int cont=0;
 
 	strcat(nombreb,pnombre);
-	//strcat(nombreb,ext);
 
 	FILE *in_file;
 
@@ -138,19 +135,23 @@ struct databases* ldb(char *pnombre)
 		}else if(cont==1)
 		{
 			fscanf(in_file, "%d", &(database->size));
-		}else if(cont>2)
+			database->registros = malloc(database->size*sizeof(struct estudiantes));
+
+		}else if(cont>=2)
 		{
-			registros = (struct estudiantes *)realloc(registros,((cont+1)*sizeof(struct estudiantes)));
-			fscanf(in_file, "%d", &(registros+cont)->cedula);
-			fscanf(in_file, "%s", &(registros+cont)->nombre);
-			fscanf(in_file, "%d", &(registros+cont)->semestre);
+			fscanf(in_file, "%d", &database->registros[cont-2].cedula);
+			fscanf(in_file, "%s", database->registros[cont-2].nombre);
+			fscanf(in_file, "%d", &database->registros[cont-2].semestre);
 		}
 
 		cont++;
 	}
+
+	database->cant_reg=(cont-3);
+	gestor->bases[contdb]= database;
+
 	fclose(in_file);
 
-	return database;
 }
 
 void lsdbs(struct gestores* gestor)
@@ -161,9 +162,9 @@ void lsdbs(struct gestores* gestor)
 		printf("Base de datos número: %d\n", (i+1));
 		printf("Nombre: %s\n", gestor->bases[i]->nombre);
 		printf("Tamaño: %d\n", gestor->bases[i]->size);
+		printf("Cantidad de registros: %d\n", gestor->bases[i]->cant_reg);
 		i++;
 	}
-	printf("Cantidad de registros: %d", i-1);
 }
 
 void gdb(struct gestores* gestor,int index)
@@ -175,7 +176,7 @@ void gdb(struct gestores* gestor,int index)
 	}
 	printf("El nombre de la bd activa es: %s\n", gestor->bases[index]->nombre);
 	printf("El tamaño de la bd activa es: %d\n", gestor->bases[index]->size);
-	printf("Cantidad de registros disponibles: %d\n", (gestor->bases[index]->size-i));
+	printf("Cantidad de registros disponibles: %d\n", (gestor->bases[index]->size-gestor->bases[index]->cant_reg));
 }
 
 int sdb(struct gestores* gestor,char* nombre)
@@ -200,14 +201,16 @@ int sdb(struct gestores* gestor,char* nombre)
 void svdb(struct gestores* gestor, int index)
 {
 	FILE *in_file;
+	char nombrearch[30];
 	char nombreb[100]="/home/juancardozo/Documents/";
-	char ext[5]=".txt";
+	strcpy(nombrearch,gestor->bases[index]->nombre);
 	int i=0;
-	strcat(nombreb,gestor->bases[index]->nombre);
-	strcat(nombreb,ext);
+	strcat(nombreb,nombrearch);
 	in_file = fopen(nombreb, "w");
-	while(gestor->bases[index]->registros[i] != NULL){
-		fprintf(in_file,"%d %s %d\n", gestor->bases[index]->registros[i]->cedula, gestor->bases[index]->registros[i]->nombre, gestor->bases[index]->registros[i]->semestre);
+	fprintf(in_file,"%s\n", gestor->bases[index]->nombre);
+	fprintf(in_file, "%d\n", gestor->bases[index]->cant_reg);
+	while(i < gestor->bases[index]->cant_reg){
+		fprintf(in_file,"%d %s %d\n", gestor->bases[index]->registros[i].cedula, gestor->bases[index]->registros[i].nombre, gestor->bases[index]->registros[i].semestre);
 		i++;
 	}
 	fclose(in_file);
@@ -216,30 +219,31 @@ void svdb(struct gestores* gestor, int index)
 void radb(struct gestores* gestor, int index)
 {
 	int i=0;
-	while(gestor->bases[index]->registros[i] != NULL)
+	while(i < gestor->bases[index]->cant_reg)
 	{
-		printf("Registro %d\n", i);
-		printf("Nombre: %s\n", gestor->bases[index]->registros[i]->nombre);
-		printf("Cédula: %d\n", gestor->bases[index]->registros[i]->cedula);
-		printf("Semestre: %d\n", gestor->bases[index]->registros[i]->semestre);
+		printf("Registro %d\n", i+1);
+		printf("Nombre: %s\n", gestor->bases[index]->registros[i].nombre);
+		printf("Cédula: %d\n", gestor->bases[index]->registros[i].cedula);
+		printf("Semestre: %d\n", gestor->bases[index]->registros[i].semestre);
 		i++;
 	}
 
 	if(i==0){
-	    printf("No hay registros");
+	    printf("No hay registros\n");
 	}
 }
 
 int rsdb(struct gestores* gestor, int index)
 {
 	int i=0;
-	while(gestor->bases[index]->registros[i] != NULL)
+	while(i < gestor->bases[index]->cant_reg)
 	{
 		i++;
 	}
+	printf("%d\n", i);
 
 	if(i==0){
-		printf("No hay registros");
+		printf("No hay registros\n");
 	}
 	return i;
 }
@@ -249,11 +253,12 @@ void mreg(struct gestores* gestor, int index, int cedula, char *pnombreE, int se
 	int i = 0;
 	while(1)
 	{
-		if(gestor->bases[index]->registros[i] != NULL)
+		if(i == gestor->bases[index]->cant_reg)
 		{
-			strcpy(gestor->bases[index]->registros[i]->nombre,pnombreE);
-			gestor->bases[index]->registros[i]->cedula = cedula;
-			gestor->bases[index]->registros[i]->semestre = semestre;
+			strcpy(gestor->bases[index]->registros[i].nombre,pnombreE);
+			gestor->bases[index]->registros[i].cedula = cedula;
+			gestor->bases[index]->registros[i].semestre = semestre;
+			gestor->bases[index]->cant_reg += 1;
 			break;
 		}
 		i++;
@@ -263,13 +268,13 @@ void mreg(struct gestores* gestor, int index, int cedula, char *pnombreE, int se
 void rr(struct gestores* gestor, int index, int cedula)
 {
 	int i=0;
-	while(gestor->bases[index]->registros[i] != NULL)
+	while(i < gestor->bases[index]->cant_reg)
 	{
-		if(gestor->bases[index]->registros[i]->cedula == cedula)
+		if(gestor->bases[index]->registros[i].cedula == cedula)
 		{
-			printf("Nombre: %s\n", gestor->bases[index]->registros[i]->nombre);
-			printf("Cédula: %d\n", gestor->bases[index]->registros[i]->cedula);
-			printf("Semestre: %d\n", gestor->bases[index]->registros[i]->semestre);
+			printf("Nombre: %s\n", gestor->bases[index]->registros[i].nombre);
+			printf("Cédula: %d\n", gestor->bases[index]->registros[i].cedula);
+			printf("Semestre: %d\n", gestor->bases[index]->registros[i].semestre);
 		}
 		i++;
 	}
@@ -285,20 +290,16 @@ int main(void) {
 	char comando[30];
 	char del[]=" ";
 	int contdb=0;
-	int index;
+	int index=0;
 
 	struct gestores* gestor = gestor_new();
 	gestor_ctor(gestor, "popsql", 5);
 
-	printf("Presione enter para empezar el programa");
 	do
 	{
 		fgets(comando,31,stdin);
-		printf("Ingrese un comando:\n");
-		fgets(comando,31,stdin);
 	    comando[strcspn(comando, "\n")] = '\0';
 		char *token = strtok(comando, del);
-		printf("Encontramos un token: %s\n", token);
 
 		if(strcmp(token, "mdb")==0)
 		{
@@ -318,16 +319,16 @@ int main(void) {
 				}
 				cont++;
 			}
-			gestor->bases[contdb]= mdb(arg1,atoi(arg2));
+			mdb(gestor,contdb,arg1,atoi(arg2));
+			contdb++;
 		}else if(strcmp(token, "ldb")==0)
 		{
 			char arg1[20];
 
 			token = strtok(NULL, " ");
 			strcpy(arg1,token);
-			printf("%s\n", arg1);
 
-			gestor->bases[contdb] = ldb(arg1);
+			ldb(gestor,contdb,arg1);
 			contdb++;
 		}else if(strcmp(token, "lsdbs")==0)
 		{
@@ -342,7 +343,6 @@ int main(void) {
 
 			token = strtok(NULL, " ");
 			strcpy(arg1,token);
-			printf("%s\n", arg1);
 
 			index=sdb(gestor,arg1);
 		}else if(strcmp(token,"svdb")==0)
@@ -370,14 +370,11 @@ int main(void) {
 				if(cont==0)
 				{
 					strcpy(arg2,token);
-					printf("%s\n", arg2);
 				}else if(cont==1)
 				{
 					strcpy(arg1,token);
-					printf("%s\n", arg1);
 				}else if(cont==2){
 					strcpy(arg3,token);
-					printf("%s\n", arg3);
 				}
 				cont++;
 			}
@@ -389,7 +386,6 @@ int main(void) {
 
 			token = strtok(NULL, " ");
 			strcpy(arg1,token);
-			printf("%s\n", arg1);
 			rr(gestor,index,atoi(arg1));
 
 		}else if(strcmp(token, "exit")==0)
@@ -397,7 +393,7 @@ int main(void) {
 			exitwhile=exitp();
 		}else
 		{
-			printf("Error en el comando");
+			printf("Error en el comando\n");
 		}
 
 	}while(exitwhile!=0);
