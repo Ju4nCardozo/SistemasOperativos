@@ -65,11 +65,6 @@ void db_ctor(struct databases* database, char *nombre, int size)
 	database->registros = malloc(database->size*sizeof(struct estudiantes));;
 }
 
-// Destructor
-void db_dtor(struct databases* database) {
-	//free();
-}
-
 // Attribute structure
 struct gestores
 {
@@ -90,11 +85,6 @@ void gestor_ctor(struct gestores* gestor, char *nombre, int sizeg)
 	strcpy(gestor->nombre, nombre);
 	gestor->sizeg=sizeg;
 	gestor->bases = (struct databases*)malloc(sizeg*sizeof(struct databases));
-}
-
-// Destructor
-void gestor_dtor(struct gestores* gestor) {
-	//free();
 }
 
 void mdb(struct gestores* gestor,int contdb,char *nombre, int size)
@@ -289,6 +279,7 @@ int main(void) {
 
 	char comando[30];
 	char del[]=" ";
+	char exit[2]=" ";
 	int contdb=0;
 	int index=0;
 
@@ -390,7 +381,15 @@ int main(void) {
 
 		}else if(strcmp(token, "exit")==0)
 		{
-			exitwhile=exitp();
+			printf("¿Desea guardar la bd? y/n\n");
+			scanf("%c", exit);
+			if(strcmp(exit, "y")==0){
+				svdb(gestor, index);
+				exitwhile=exitp();
+			}else{
+				exitwhile=exitp();
+			}
+
 		}else
 		{
 			printf("Error en el comando\n");

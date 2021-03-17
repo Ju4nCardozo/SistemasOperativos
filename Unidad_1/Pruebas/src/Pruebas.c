@@ -10,15 +10,21 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char* argv[])
 {
 
-   #ifdef CONDITION
-   printf("CODIGO IF\n");
-   #else
-   printf("CODIGO ELSE\n");
-   #endif
+	char cadena[] = "Hola,mundo,soy,una,cadena,separa,por,comas",
+	delimitador[] = ",";
+	char *token = strtok(cadena, delimitador);
+	if(token != NULL){
+	    while(token != NULL){
+	         // Sólo en la primera pasamos la cadena; en las siguientes pasamos NULL
+	         printf("Token: %s\n", token);
+	         token = strtok(NULL, delimitador);
+	    }
+	}
    return 0;
  }
 
