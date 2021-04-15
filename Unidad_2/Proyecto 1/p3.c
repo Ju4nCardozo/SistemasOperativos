@@ -9,6 +9,7 @@ void imprimirarchivo(char archivo[15]){
     FILE *in_file;
     char ruta[30] = "/home/juancardozo/Documents/";
     char registro[50];
+    char aux[2];
     strcat(ruta,archivo);
 
     in_file = fopen(ruta, "r");
@@ -19,12 +20,13 @@ void imprimirarchivo(char archivo[15]){
 		exit(8);
 	}
 
-    while(!feof(in_file))
-	{
-        fgets(registro, 49, in_file);
+    do{
+
         printf("%s", registro);
-    }
-    fclose(in_file);
+        fgets(registro, 49, in_file);
+        
+
+    }while(!feof(in_file));
 }
 
 int main(int argc, char *argv[]) {
