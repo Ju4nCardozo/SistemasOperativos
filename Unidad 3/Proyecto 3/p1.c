@@ -14,7 +14,6 @@
 
 int shared_fd = -1;
 char * ptr;
-int unlinkt = 0;
 int len;
 sem_t* semaphore1 = NULL;
 sem_t* semaphore2 = NULL;
